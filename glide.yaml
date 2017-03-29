@@ -1,0 +1,12 @@
+package: github.com/allegro/marathon-appcop
+import:
+- package: github.com/Sirupsen/logrus
+- package: github.com/cyberdelia/go-metrics-graphite
+- package: github.com/ogier/pflag
+- package: github.com/rcrowley/go-metrics
+- package: github.com/sethgrid/pester
+testImport:
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
+  - require

@@ -1,0 +1,30 @@
+{
+  "Web": {
+    "Listen": ":4444",
+    "MyLeader": ""
+  },
+  "Marathon": {
+    "Location": "example.com:8080",
+    "Protocol": "http",
+    "Username": "",
+    "Password": "",
+    "VerifySsl": true
+  },
+  "Score": {
+    "ScaleDownScore": 200,
+    "UpdateInterval": 2000000000,
+    "ResetInterval": 86400000000000,
+    "EvaluateInterval": 20000000000
+  },
+  "Metrics": {
+    "Target": "stdout",
+    "Prefix": "default",
+    "Interval": 30000000000,
+    "Addr": ""
+  },
+  "Log": {
+    "Level": "info",
+    "Format": "text"
+  }
+}
+
