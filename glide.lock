@@ -1,0 +1,31 @@
+hash: cdbab15413ea5a796fb7d267bc1c283de88eb10d352d0cbec4fd9cecedb936ed
+updated: 2017-03-15T13:57:12.272147094+01:00
+imports:
+- name: github.com/cyberdelia/go-metrics-graphite
+  version: 7e54b5c2aa6eaff4286c44129c3def899dff528c
+- name: github.com/ogier/pflag
+  version: 32a05c62658bd1d7c7e75cbc8195de5d585fde0f
+- name: github.com/rcrowley/go-metrics
+  version: bdb33529eca3e55eac7328e07c57012a797af602
+- name: github.com/sethgrid/pester
+  version: ab3a58f3fbc32058b25cf9e416272cf0097be523
+- name: github.com/Sirupsen/logrus
+  version: c078b1e43f58d563c74cebe63c85789e76ddb627
+- name: golang.org/x/sys
+  version: 478fcf54317e52ab69f40bb4c7a1520288d7f7ea
+  subpackages:
+  - unix
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
+  - require

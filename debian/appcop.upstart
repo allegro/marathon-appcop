@@ -1,0 +1,15 @@
+description "AppCop - Marathon applications law enforcement"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+script
+echo $$ > /var/run/appcop.pid
+   exec appcop --config-file=/etc/appcop/appcop.json
+end script
+
+post-stop script
+    rm -f /var/run/appcop.pid
+end script
