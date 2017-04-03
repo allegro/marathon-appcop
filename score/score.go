@@ -24,6 +24,7 @@ type Scorer struct {
 	ResetInterval    time.Duration
 	UpdateInterval   time.Duration
 	EvaluateInterval time.Duration
+	DryRun           bool
 	ScaleLimit       int
 	service          marathon.Marathoner
 	scores           map[marathon.AppID]*Score
@@ -53,6 +54,7 @@ func New(config Config, m marathon.Marathoner) (*Scorer, error) {
 		UpdateInterval:   config.UpdateInterval,
 		EvaluateInterval: config.EvaluateInterval,
 		ScaleLimit:       config.ScaleLimit,
+		DryRun:           config.DryRun,
 		service:          m,
 		scores:           make(map[marathon.AppID]*Score),
 	}, nil
@@ -62,6 +64,10 @@ func New(config Config, m marathon.Marathoner) (*Scorer, error) {
 func (s *Scorer) ScoreManager() chan Update {
 	updates := make(chan Update)
 
+	log.Info("Starting ScoreManager")
+	if s.DryRun {
+		log.Info("DryRun, NOOP mode")
+	}
 	printTicker := time.NewTicker(s.UpdateInterval)
 	evaluateTicker := time.NewTicker(s.EvaluateInterval)
 	resetTimer := time.NewTicker(s.ResetInterval)
@@ -196,6 +202,15 @@ func (s *Scorer) scaleDown(appID marathon.AppID) error {
 	app, err := s.service.AppGet(appID)
 	if err != nil {
 		return err
+	}
+
+	// dry-run flag
+	if s.DryRun {
+		log.WithFields(log.Fields{
+			"appId": appID,
+			"score": s.scores[appID].score,
+		}).Info("NOOP - App Scale Down")
+		return nil
 	}
 
 	err = s.service.AppScaleDown(app)

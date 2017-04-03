@@ -102,6 +102,7 @@ func TestConfig_ShouldBeMergedWithFileDefaultsAndFlags(t *testing.T) {
 			ResetInterval:    24 * time.Hour,
 			EvaluateInterval: 20 * time.Second,
 			ScaleLimit:       0,
+			DryRun:           false,
 		},
 		Metrics: metrics.Config{Target: "stdout",
 			Prefix:   "default",

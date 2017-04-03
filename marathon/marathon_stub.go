@@ -18,10 +18,16 @@ type MStub struct {
 	GroupDelFail     bool
 	AppScaleDownFail bool
 	FailCounter      *FailCounter
+	ScaleCounter     *ScaleCounter
 }
 
 // FailCounter is structure to hold state between failures
 type FailCounter struct {
+	Counter int
+}
+
+// ScaleCounter is counting scaling operations
+type ScaleCounter struct {
 	Counter int
 }
 
@@ -70,6 +76,7 @@ func (m MStub) AppScaleDown(app *App) error {
 	if m.AppScaleDownFail {
 		return errors.New("Unable to scale down")
 	}
+	m.ScaleCounter.Counter = 1
 	return nil
 }
 

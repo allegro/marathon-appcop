@@ -10,7 +10,7 @@ import (
 )
 
 func newTestScorer() (*Scorer, error) {
-	return New(Config{1, 1, 3, 2, 1}, nil)
+	return New(Config{false, 1, 1, 3, 2, 1}, nil)
 }
 
 func TestNewProvidedConfigContainsUnsensibleValuesReturnsErrorAndNilScorer(t *testing.T) {
@@ -39,6 +39,7 @@ func TestNewReturnsCorrectlyInitializedScorerAndNoError(t *testing.T) {
 		ResetInterval:    3,
 		EvaluateInterval: 2,
 		ScaleLimit:       1,
+		DryRun:           false,
 	}
 	// when
 	expectedScorer := &Scorer{
@@ -270,8 +271,9 @@ var evaluateScoresTestCases = []struct {
 func TestEvaluateScoresTestCases(t *testing.T) {
 	t.Parallel()
 	for _, testCase := range evaluateScoresTestCases {
-		m := marathon.MStub{}
-		scorer, err := New(Config{testCase.scaleDownScore, 1, 3, 2, 1}, m)
+		scaleCounter := &marathon.ScaleCounter{Counter: 0}
+		m := marathon.MStub{ScaleCounter: scaleCounter}
+		scorer, err := New(Config{false, testCase.scaleDownScore, 1, 3, 2, 1}, m)
 		require.NoError(t, err)
 		// feed scores
 		for app, score := range testCase.initialScores {
@@ -281,5 +283,29 @@ func TestEvaluateScoresTestCases(t *testing.T) {
 		appsToPacify, _ := scorer.evaluateApps()
 		// check assertions
 		assert.Equal(t, testCase.expectedAppsToPacify, appsToPacify)
+		// expectedAppsToPacify equals ScaleCounter increments
+		assert.Equal(t, testCase.expectedAppsToPacify, m.ScaleCounter.Counter)
+	}
+}
+
+func TestEvaluateScoresTestCasesWithDryRunTrue(t *testing.T) {
+	t.Parallel()
+	for _, testCase := range evaluateScoresTestCases {
+		scaleCounter := &marathon.ScaleCounter{Counter: 0}
+		m := marathon.MStub{ScaleCounter: scaleCounter}
+		scorer, err := New(Config{true, testCase.scaleDownScore, 1, 3, 2, 1}, m)
+		require.NoError(t, err)
+		// feed scores
+		for app, score := range testCase.initialScores {
+			scorer.scores[app] = &Score{score, time.Now()}
+		}
+		// actual evaluation
+		appsToPacify, _ := scorer.evaluateApps()
+		// check assertions
+		// check how many apps are above threshold
+		assert.Equal(t, testCase.expectedAppsToPacify, appsToPacify)
+		// expectedAppsToPacify equals ScaleCounter increments
+		// when dry run -> never pacify
+		assert.Equal(t, 0, m.ScaleCounter.Counter)
 	}
 }
