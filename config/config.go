@@ -84,6 +84,9 @@ func (config *Config) parseFlags() {
 		"Time limit for requests made by the Marathon HTTP client. A Timeout of zero means no timeout")
 
 	// Score
+	flag.BoolVar(&config.Score.DryRun,
+		"dry-run", false,
+		"Perform a trial run with no changes made to marathon.")
 	flag.IntVar(&config.Score.ScaleDownScore,
 		"scale-down-score", 200,
 		"Score for application to scale it one instance down.")

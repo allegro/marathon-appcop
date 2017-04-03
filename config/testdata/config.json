@@ -14,7 +14,8 @@
     "ScaleDownScore": 200,
     "UpdateInterval": 2000000000,
     "ResetInterval": 86400000000000,
-    "EvaluateInterval": 20000000000
+    "EvaluateInterval": 20000000000,
+    "DryRun": false
   },
   "Metrics": {
     "Target": "stdout",
@@ -27,4 +28,3 @@
     "Format": "text"
   }
 }
-

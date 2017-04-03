@@ -105,6 +105,7 @@ mgc-enabled                 | `true`            | Enable garbage collecting of M
 mgc-max-suspend-time        | `7 days`          | How long application should be suspended before deleting it
 mgc-interval                | `8 hours`         | Marathon GC interval
 mgc-appcop-only             | `true`            | Delete only applications suspended by AppCop
+dry-run                     | `false`           | Perform a trial run with no changes made to marathon
 
 
 ### Endpoints
