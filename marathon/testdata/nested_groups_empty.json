@@ -1,0 +1,47 @@
+{
+
+    "id": "/",
+    "dependencies": [ ],
+    "version": "",
+    "apps": [ ],
+    "groups": [
+        {
+            "id": "/grpa",
+            "dependencies": [ ],
+            "version": "",
+            "apps": [ ],
+            "groups": [
+                {
+                    "id": "/grpa/grpb",
+                    "dependencies": [ ],
+                    "version": "",
+                    "apps": [ ],
+                    "groups": [
+                        {
+                            "id": "/grpa/grpb/grpc0",
+                            "dependencies": [ ],
+                            "version": "",
+                            "apps": [ ],
+                            "groups": [ ]
+                        },
+                        {
+                            "id": "/grpa/grpb/grpc1",
+                            "dependencies": [ ],
+                            "version": "",
+                            "apps": [ ],
+                            "groups": [ ]
+                        }
+                    ]
+                },
+                {
+                    "id": "/grpa/grpb1",
+                    "dependencies": [ ],
+                    "version": "",
+                    "apps": [ ],
+                    "groups": [ ]
+                }
+            ]
+        }
+    ]
+
+}
