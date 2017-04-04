@@ -102,3 +102,8 @@ func (m MStub) GroupDelete(groupID GroupID) error {
 	}
 	return nil
 }
+
+// GetEmptyLeafGroups returns groups from marathon which are leafs in group tree
+func (m MStub) GetEmptyLeafGroups() ([]*Group, error) {
+	return []*Group{}, nil
+}

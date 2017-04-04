@@ -80,7 +80,7 @@ func (mgc *MarathonGC) gcSuspended() {
 // It is evaluating time of last group update
 func (mgc *MarathonGC) gcEmptyGroups() {
 	log.Info("Staring GC on empty groups")
-	groups, err := mgc.marathon.GroupsGet()
+	groups, err := mgc.marathon.GetEmptyLeafGroups()
 	if err != nil {
 		log.WithError(err).Error("Ending GCEmptyGroups")
 		return

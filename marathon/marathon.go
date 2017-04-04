@@ -26,8 +26,8 @@ type Marathoner interface {
 	LeaderGet() (string, error)
 	AppScaleDown(*App) error
 	AppDelete(AppID) error
-	GroupsGet() ([]*Group, error)
 	GroupDelete(GroupID) error
+	GetEmptyLeafGroups() ([]*Group, error)
 }
 
 // Marathon reciever
@@ -349,8 +349,26 @@ func (m Marathon) urlWithQuery(path string, params urlParams) string {
 	return marathon.String()
 }
 
-// GroupsGet get marathons application from v2/apps/<AppID>
-func (m Marathon) GroupsGet() ([]*Group, error) {
+// GetEmptyLeafGroups returns groups which are leafs of groups
+// directory and only if they are empty (no apps inside).
+func (m Marathon) GetEmptyLeafGroups() ([]*Group, error) {
+	groups, err := m.groupsGet()
+	if err != nil {
+		return nil, err
+	}
+
+	nestedGroups := m.getLeafGroups(groups)
+	var emptyLeafs []*Group
+	for _, group := range nestedGroups {
+		if group.IsEmpty() {
+			emptyLeafs = append(emptyLeafs, group)
+		}
+	}
+	return emptyLeafs, nil
+}
+
+// groupsGet get marathons application from v2/apps/<AppID>
+func (m Marathon) groupsGet() ([]*Group, error) {
 	log.Debug("Asking Marathon for list of groups")
 
 	body, err := m.get(m.url("/v2/groups/"))
@@ -359,6 +377,22 @@ func (m Marathon) GroupsGet() ([]*Group, error) {
 	}
 
 	return ParseGroups(body)
+}
+
+// getNestedGroups returns any group inside provided group
+// if there is no nested group then returned group should be nil
+func (m Marathon) getLeafGroups(groups []*Group) []*Group {
+	var retGroup []*Group
+
+	for _, group := range groups {
+		if len(group.Groups) == 0 {
+			retGroup = append(retGroup, group)
+			continue
+		}
+		retGroup = append(retGroup, m.getLeafGroups(group.Groups)...)
+	}
+
+	return retGroup
 }
 
 // GroupDelete scales down app by provided AppID

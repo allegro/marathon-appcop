@@ -2,6 +2,7 @@ package marathon
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -481,7 +482,7 @@ func TestMarathonGroupsGetSuccessMarathonReturnsOneGroup(t *testing.T) {
 	m.client.Transport = transport
 
 	// when
-	groups, err := m.GroupsGet()
+	groups, err := m.groupsGet()
 	//then
 	require.NoError(t, err)
 	require.NotNil(t, groups)
@@ -505,7 +506,7 @@ func TestMarathonGroupsGetWhenMarathonReturns500(t *testing.T) {
 	m.client.Concurrency = 1
 	m.client.MaxRetries = 1
 	// when
-	_, err := m.GroupsGet()
+	_, err := m.groupsGet()
 	//then
 	assert.Error(t, err)
 }
@@ -547,6 +548,64 @@ func TestMarathonGroupDeleteWhenMarathonReturns500(t *testing.T) {
 	err := m.GroupDelete("testgroup")
 	//then
 	assert.Error(t, err)
+}
+
+var getEmptyLeafGroupsTestCases = []struct {
+	testFilename string
+	expectedIDs  []GroupID
+}{
+	{
+		testFilename: "testdata/one_root_group.json",
+		expectedIDs: []GroupID{
+			GroupID("idgroup0"),
+		},
+	},
+	{
+		testFilename: "testdata/nested_groups_empty.json",
+		expectedIDs: []GroupID{
+			GroupID("/grpa/grpb/grpc0"),
+			GroupID("/grpa/grpb/grpc1"),
+			GroupID("/grpa/grpb1"),
+		},
+	},
+	{
+		testFilename: "testdata/nested_groups_two_empty_one_with_app.json",
+		expectedIDs: []GroupID{
+			GroupID("/grpa/grpb/grpc1"),
+			GroupID("/grpa/grpb1"),
+		},
+	},
+	{
+		testFilename: "testdata/no_groups.json",
+		expectedIDs:  nil,
+	},
+}
+
+func TestMarathonEmptyGetLeafGroupsTestCases(t *testing.T) {
+	for _, testCase := range getEmptyLeafGroupsTestCases {
+		buffer, err := ioutil.ReadFile(testCase.testFilename)
+		require.NoError(t, err)
+
+		server, transport := stubServer("/v2/groups/",
+			string(buffer),
+		)
+		defer server.Close()
+		url, _ := url.Parse(server.URL)
+		m, _ := New(Config{Location: url.Host, Protocol: "HTTP"})
+		m.client.Transport = transport
+
+		groups, err := m.GetEmptyLeafGroups()
+		require.NoError(t, err)
+
+		assert.Equal(t, len(testCase.expectedIDs), len(groups))
+
+		for i := 0; i < len(testCase.expectedIDs); i++ {
+			expectedID := testCase.expectedIDs[i]
+			actualID := groups[i].ID
+
+			assert.Equal(t, expectedID, actualID)
+		}
+	}
 }
 
 // http://keighl.com/post/mocking-http-responses-in-golang/
