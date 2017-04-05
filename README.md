@@ -1,4 +1,4 @@
-# AppCop
+# AppCop [![Build](https://travis-ci.org/allegro/marathon-appcop.svg?branch=master)](https://travis-ci.org/allegro/marathon-appcop.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/allegro/marathon-appcop/badge.svg?branch=master)](https://coveralls.io/github/allegro/marathon-appcop?branch=master)
 
 `Marathon AppCop` - Marathon applications law enforcement.
 
