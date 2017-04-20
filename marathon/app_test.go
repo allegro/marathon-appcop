@@ -1,6 +1,7 @@
 package marathon
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -90,4 +91,76 @@ func TestParseTasksRecievesMalformedJSONBlob(t *testing.T) {
 	_, err := ParseTasks(taskJSON)
 	//	//then
 	require.Error(t, err)
+}
+
+var penalizeTestCases = []struct {
+	app         *App
+	expectedApp *App
+	expectedErr error
+}{
+	{
+		app: &App{ID: "testApp0", Instances: 1, Labels: map[string]string{}},
+		expectedApp: &App{ID: "testApp0",
+			Instances: 0,
+			Labels:    map[string]string{"appcop": "suspend"}},
+		expectedErr: nil,
+	},
+	{
+		app: &App{ID: "testApp1",
+			Instances: 2,
+			Labels:    map[string]string{},
+		},
+		expectedApp: &App{ID: "testApp1",
+			Instances: 1,
+			Labels:    map[string]string{"appcop": "scaleDown"}},
+		expectedErr: nil,
+	},
+	{
+		app: &App{ID: "testApp2",
+			Instances: 2,
+			Labels:    map[string]string{},
+		},
+		expectedApp: &App{ID: "testApp2",
+			Instances: 1,
+			Labels:    map[string]string{"appcop": "scaleDown"}},
+		expectedErr: nil,
+	},
+	{
+		app: &App{ID: "testApp3",
+			Instances: 2,
+			Labels:    map[string]string{"APPLABEL": "true"}},
+		expectedApp: &App{ID: "testApp3",
+			Instances: 1,
+			Labels:    map[string]string{"appcop": "scaleDown", "APPLABEL": "true"}},
+		expectedErr: nil,
+	},
+	{
+		app: &App{ID: "testApp4",
+			Instances: 0,
+			Labels:    map[string]string{"APPLABEL": "true"}},
+		expectedApp: &App{ID: "testApp4",
+			Instances: 0,
+			Labels:    map[string]string{"APPLABEL": "true"}},
+		expectedErr: fmt.Errorf("Unable to scale down, zero instance"),
+	},
+}
+
+func TestPenalizeTestCases(t *testing.T) {
+	for _, testCase := range penalizeTestCases {
+		err := testCase.app.penalize()
+		require.Equal(t, testCase.expectedErr, err)
+		assert.Equal(t, testCase.app, testCase.expectedApp)
+	}
+}
+
+func TestIsImmuneShouldReturnTrueWhenImmunityLabelIsSetTrue(t *testing.T) {
+	// given
+	app := &App{
+		Labels: map[string]string{ApplicationImmunityLabel: "true"},
+	}
+	// when
+	actualExcused := app.HasImmunity()
+	expectedExcused := true
+	// then
+	assert.Equal(t, expectedExcused, actualExcused)
 }

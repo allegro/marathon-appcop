@@ -309,3 +309,44 @@ func TestEvaluateScoresTestCasesWithDryRunTrue(t *testing.T) {
 		assert.Equal(t, 0, m.ScaleCounter.Counter)
 	}
 }
+
+func TestScaleDownShouldReturnErrorWhenApplicationHasImmunityLabelSet(t *testing.T) {
+	t.Parallel()
+	// given
+	m := marathon.MStub{}
+	app := &marathon.App{
+		ID:        "testApp0",
+		Labels:    map[string]string{marathon.ApplicationImmunityLabel: "true"},
+		Instances: 1,
+	}
+	m.Apps = []*marathon.App{app}
+	scorer, err := New(Config{false, 1, 1, 3, 2, 1}, m)
+	require.NoError(t, err)
+	scorer.scores[app.ID] = &Score{1, time.Now()}
+	// when
+	err = scorer.scaleDown("testApp0")
+	// then
+	assert.Error(t, err)
+}
+
+func TestScaleDownShouldReturnNoErrorAndScaleApplicationDownWhenNoImmunityLabelSet(t *testing.T) {
+	t.Parallel()
+	// given
+	scaleCounter := &marathon.ScaleCounter{Counter: 0}
+	m := marathon.MStub{ScaleCounter: scaleCounter}
+	app := &marathon.App{
+		ID:        "testApp0",
+		Labels:    map[string]string{},
+		Instances: 1,
+	}
+	m.Apps = []*marathon.App{app}
+	scorer, err := New(Config{false, 1, 1, 3, 2, 1}, m)
+	scorer.scores[app.ID] = &Score{1, time.Now()}
+	require.NoError(t, err)
+	// when
+	err = scorer.scaleDown("testApp0")
+	// then
+	expectedScale := 1
+	assert.NoError(t, err)
+	assert.Equal(t, expectedScale, m.ScaleCounter.Counter)
+}
