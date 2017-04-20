@@ -3,7 +3,6 @@ package marathon
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -247,31 +246,17 @@ func (m Marathon) delete(url string) ([]byte, error) {
 
 // AppScaleDown scales down app by provided AppID
 func (m Marathon) AppScaleDown(app *App) error {
-	var instances int
 
 	log.WithFields(log.Fields{
 		"AppID": app.ID,
 	}).Debug("Scaling Down application because of score.")
 
-	if app.Instances >= 1 {
-		instances = app.Instances - 1
-	} else {
-		return errors.New("Unable to scale down, zero instance")
+	err := app.penalize()
+	if err != nil {
+		return err
 	}
 
-	// rewrite labels and add new one
-	labels := app.Labels
-	if instances == 0 {
-		labels["appcop"] = "suspend"
-	} else {
-		labels["appcop"] = "scaleDown"
-	}
-	log.WithFields(log.Fields{
-		"AppID": app,
-		"label": labels["appcop"],
-	}).Info("Altering labels.")
-
-	scaleData := &ScaleData{Instances: instances, Labels: labels}
+	scaleData := &ScaleData{Instances: app.Instances, Labels: app.Labels}
 	u, err := json.Marshal(scaleData)
 	if err != nil {
 		return err
@@ -281,14 +266,16 @@ func (m Marathon) AppScaleDown(app *App) error {
 	url := m.urlWithQuery(fmt.Sprintf("/v2/apps/%s", trimmedAppID),
 		urlParams{"force": "true"})
 
-	log.WithFields(log.Fields{
-		"url": url,
-	}).Debug("Application url.")
-
 	body, err := m.update(url, u)
 	if err != nil {
 		return err
 	}
+
+	log.WithFields(log.Fields{
+		"URL":       url,
+		"Labels":    app.Labels,
+		"Instances": app.Instances,
+	}).Debug("Updated app")
 
 	scaleResponse := &ScaleResponse{}
 	return json.Unmarshal(body, scaleResponse)

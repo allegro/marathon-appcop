@@ -41,6 +41,11 @@ func (m MStub) AppsGet() ([]*App, error) {
 
 // AppGet get stubbed app
 func (m MStub) AppGet(appID AppID) (*App, error) {
+	for _, app := range m.Apps {
+		if app.ID == appID {
+			return app, nil
+		}
+	}
 	return &App{ID: appID}, nil
 }
 

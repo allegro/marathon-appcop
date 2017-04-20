@@ -2,8 +2,11 @@ package marathon
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 )
+
+const ApplicationImmunityLabel = "APP_IMMUNITY"
 
 // AppWrapper json returned from marathon with app definition
 type AppWrapper struct {
@@ -22,6 +25,32 @@ type App struct {
 	Tasks       []Task            `json:"tasks"`
 	Instances   int               `json:"instances"`
 	VersionInfo VersionInfo       `json:"versionInfo"`
+}
+
+// HasImmunity check if application behavior is tolerated without consequence
+func (app App) HasImmunity() bool {
+	if val, ok := app.Labels[ApplicationImmunityLabel]; ok && val == "true" {
+		return true
+	}
+	return false
+}
+
+func (app *App) penalize() error {
+
+	if app.Instances >= 1 {
+		app.Instances--
+	} else {
+		return fmt.Errorf("Unable to scale down, zero instance")
+	}
+
+	if app.Instances == 0 {
+		app.Labels["appcop"] = "suspend"
+	} else {
+		app.Labels["appcop"] = "scaleDown"
+	}
+
+	return nil
+
 }
 
 // VersionInfo represents json field of  this name, inside marathon app

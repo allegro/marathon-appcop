@@ -55,15 +55,7 @@ To build deb package:
 make pack
 ```
 
-Get docker <containerID> of last container:
-```
-docker ps -n=1
-```
-Copy packages from container filesystem:
-```
-docker cp <containerID>:/work/appcop_<version>.deb . && docker cp <containerID>:/work/appcop-<version>.rpm .
-```
-
+Check dist/ dir.
 
 ## Setting up `AppCop`
 
@@ -72,6 +64,19 @@ The event subscription should be set to `localhost` to reduce network traffic.
 Please refer to options section for more.
 
 
+## `Marathon Labels`
+
+`AppCop` is using `Marathon` labels to communicate actions or to tune execution logic.
+
+Used labels:
+
+Name                      |       Possible values     |    r/w   |    Description
+--------------------------|---------------------------|----------|------------------
+appcop                    | `suspend`, `scaleDown`    |    w     | Every time `AppCop` scales or suspend application, put appropriate label in app definition
+APP_IMMUNITY              |   `false`, `true`         |    r     | When AppCop encounters this label in app definition, treats it as immune to all penalties (excused from all criminal acts on cluster). Use this feature wisely, because if applied to often it could defeat whole purpose for using AppCop
+
+r - label is taken from app definition, not altered,
+w - label is manipulated by `AppCop`.
 
 ### Options
 
