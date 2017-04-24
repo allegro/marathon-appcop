@@ -1,11 +1,21 @@
 language: go
 dist: trusty
 sudo: false
-
+services:
+  - docker
 go:
   - 1.8
 before_install:
   - go get github.com/mattn/goveralls
 script:
-  - make release
+  - make pack
   - goveralls -coverprofile=coverage/gover.coverprofile -service travis-ci
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: Rp+trThfG+pljpISsxtYlmGkjbnqjbKHztcJJcvYDfkctxTGwCOjbk0GsbC0g+23BTB8fvAoKdD+jx2yuSIVbEM0StYrhVaztuye/1lA/L9w8Ib9pqJIH/kvZhw5aC8PyJXdZrEpxLwteJsHQP/hgwmjUHnHVGaG0VJJHpaGAYNBmng1NNiVmGdIRvAhbW3+RT+W56AGbPFsLJavsPYGK7ecYcge4SP/1V0652VjIE1saH+LpMx5ndPQ01aj2tpV5/vyWfPPKzo5/au9JaMBw7L8/L1mkZUaqFHQMLehM9rcXs7Hgcir9Tjt7faHDeIrZt+W320QXO3skmsr2Kgt49HU9Gz3v6j4XJ9wxflupWmP0b51BIhVP/qpv2V+oIFZVen5hr3P8nTPtdgrOT9kZJCK6BTGaKzoTJdOki21FerW4hwHiq5/rvjuK9/yuBn7s0IOe4c2YMy83S1ZbAw1ukLOUfbonhKy4q2Fv9WIjROOfx4AOMxQU4zJfjme3KzwoNe0UWpIpzX1eOdULMzlVU/BEVLqSAuKVhFLtu6FEf3QmJzJS0+W7jhkeHGcGg4TDRufrpspZi8tyZqKBIAXpjg5xJfNcoKnfIfgom6kHOePScu+QAp5R/UXkkoutigLcnUwGGZdgjuZnLnYxxR1+4Bz7aICajodlRtfRMbcyJo=
+  file_glob: true
+  file: dist/appcop-*
+  on:
+    tags: true
