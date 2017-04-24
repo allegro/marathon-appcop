@@ -53,3 +53,8 @@ onlylint: build
 	--disable=golint \
 	--enable=gofmt \
 	--vendor
+
+version: deps
+	echo -n $(v) > VERSION
+	git add VERSION
+	git commit -m "Release $(v)"
