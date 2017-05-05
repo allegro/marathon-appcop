@@ -28,6 +28,31 @@ AppCop is periodically fetching applications and groups from Marathon.
 When application is suspended or group is empty for long (configurable) time then it is deleted.
 
 
+### Metrics
+
+`AppCop` provides set of standard system metrics as well as application based metrics.
+
+
+#### Metric Types
+
+`System Metrics` - `AppCop` specific telemetry (e.g - queue Size, Event delays etc). Location equals, `metrics-prefix` append `metrics-system-sub-prefix`.
+
+`Applications Metrics` - Applications telemetry calculated based on events provided by marathon
+(like: task_killed, task_finished counters). Location equals, `metrics-prefix` (append) `metrics-app-sub-prefix`.
+
+Please note the existance of `appid-prefix` config option, if set, removes matching string from
+application id when it comes to metric publication. For example, assumming
+
+```
+appid-prefix = com.example.
+appID = com.example.exampleapp
+```
+your applications metric will be placed under:
+```
+{prefix}.{metrics-app-sub-prefix}.exampleapp
+```
+
+
 ## Installation
 
 ### Installing from source code
@@ -95,6 +120,7 @@ marathon-password           |                   | Marathon password for basic au
 marathon-protocol           | `http`            | Marathon protocol (http or https)
 marathon-ssl-verify         | `true`            | Verify certificates when connecting via SSL
 marathon-timeout            | `30s`             | Time limit for requests made by the Marathon HTTP client. A timeout of zero means no timeout
+appid-prefix                |                   | Prefix common to all fully qualified application ID's. Remove this preffix from applications id's ([Metric Types](#metric types))
 marathon-username           |                   | Marathon username for basic auth
 scale-down-score            | `30`              | Score for application to scale it one instance down
 scale-limit                 | `2`               | How many scale down actions to commit in one scaling down iteration
@@ -104,6 +130,8 @@ evaluate-interval           | `30s`             | How often collected scores are
 metrics-interval            | `30s`             | Metrics reporting interval
 metrics-location            |                   | Graphite URL (used when metrics-target is set to graphite)
 metrics-prefix              | `default`         | Metrics prefix (default is resolved to <hostname>.<app_name>
+metrics-system-sub-prefix   | `appcop-internal` | System specific metrics. Append to metric-prefix
+metrics-app-sub-prefix      | `applications`    | Applications specific metrics. Appended to metric-prefix
 metrics-target              | `stdout`          | Metrics destination stdout or graphite (empty string disables metrics)
 workers-pool-size           | `10`              | Number of concurrent workers processing events
 mgc-enabled                 | `true`            | Enable garbage collecting of Marathon, old suspended applications will be deleted

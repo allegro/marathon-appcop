@@ -82,6 +82,8 @@ func (config *Config) parseFlags() {
 	flag.DurationVar(&config.Marathon.Timeout,
 		"marathon-timeout", 30*time.Second,
 		"Time limit for requests made by the Marathon HTTP client. A Timeout of zero means no timeout")
+	flag.StringVar(&config.Marathon.AppIDPrefix, "appid-prefix", "",
+		"Prefix common to all fully qualified application ID's. Remove this preffix from applications id's (reffer to README to get an idea when this id is removed)")
 
 	// Score
 	flag.BoolVar(&config.Score.DryRun,
@@ -122,10 +124,16 @@ func (config *Config) parseFlags() {
 		"Metrics destination stdout or graphite (empty string disables metrics)")
 	flag.StringVar(&config.Metrics.Prefix, "metrics-prefix", "default",
 		"Metrics prefix (default is resolved to <hostname>.<app_name>")
+	flag.StringVar(&config.Metrics.SystemSubPrefix, "metrics-system-sub-prefix", "appcop-internal",
+		"System specific metrics. Append to metric-prefix")
+	flag.StringVar(&config.Metrics.AppSubPrefix, "metrics-app-sub-prefix", "applications",
+		"Applications specific metrics. Appended to metric-prefix")
 	flag.DurationVar(&config.Metrics.Interval, "metrics-interval", 30*time.Second,
 		"Metrics reporting interval")
 	flag.StringVar(&config.Metrics.Addr, "metrics-location", "",
 		"Graphite URL (used when metrics-target is set to graphite)")
+	flag.StringVar(&config.Metrics.Addr, "metrics-instance", "",
+		"Part of Graphite metric, used to distinguish between AppCop instances internal metrics.")
 
 	// Log
 	flag.StringVar(&config.Log.Level, "log-level", "info",

@@ -12,19 +12,23 @@ const totalPauseGauge = "runtime.mem.pause_total_ns"
 const lastPauseGauge = "runtime.mem.last_pause"
 
 func collectSystemMetrics() {
-	err := metrics.Register(allocGauge, baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.Alloc) }})
+	err := metrics.Register(
+		systemMetric(allocGauge), baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.Alloc) }})
 	if err != nil {
 		return
 	}
-	err = metrics.Register(heapObjectsGauge, baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.HeapObjects) }})
+	err = metrics.Register(
+		systemMetric(heapObjectsGauge), baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.HeapObjects) }})
 	if err != nil {
 		return
 	}
-	err = metrics.Register(totalPauseGauge, baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.PauseTotalNs) }})
+	err = metrics.Register(
+		systemMetric(totalPauseGauge), baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.PauseTotalNs) }})
 	if err != nil {
 		return
 	}
-	err = metrics.Register(lastPauseGauge, baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.PauseNs[(memStats.NumGC+255)%256]) }})
+	err = metrics.Register(
+		systemMetric(lastPauseGauge), baseGauge{value: func(memStats runtime.MemStats) int64 { return int64(memStats.PauseNs[(memStats.NumGC+255)%256]) }})
 	if err != nil {
 		return
 	}

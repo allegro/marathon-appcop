@@ -42,8 +42,8 @@ func TestMetricsRegistered(t *testing.T) {
 	collectSystemMetrics()
 
 	//then
-	assert.NotNil(t, metrics.Get(allocGauge))
-	assert.NotNil(t, metrics.Get(heapObjectsGauge))
-	assert.NotNil(t, metrics.Get(totalPauseGauge))
-	assert.NotNil(t, metrics.Get(lastPauseGauge))
+	assert.NotNil(t, metrics.Get(systemMetric(allocGauge)))
+	assert.NotNil(t, metrics.Get(systemMetric(heapObjectsGauge)))
+	assert.NotNil(t, metrics.Get(systemMetric(totalPauseGauge)))
+	assert.NotNil(t, metrics.Get(systemMetric(lastPauseGauge)))
 }

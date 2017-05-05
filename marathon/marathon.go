@@ -27,14 +27,16 @@ type Marathoner interface {
 	AppDelete(AppID) error
 	GroupDelete(GroupID) error
 	GetEmptyLeafGroups() ([]*Group, error)
+	GetAppIDPrefix() string
 }
 
 // Marathon reciever
 type Marathon struct {
-	Location string
-	Protocol string
-	Auth     *url.Userinfo
-	client   *pester.Client
+	Location    string
+	Protocol    string
+	appIDPrefix string
+	Auth        *url.Userinfo
+	client      *pester.Client
 }
 
 // ScaleData marathon scale json representation
@@ -81,10 +83,11 @@ func New(config Config) (*Marathon, error) {
 	pClient.Transport = transport
 
 	return &Marathon{
-		Location: config.Location,
-		Protocol: config.Protocol,
-		Auth:     auth,
-		client:   pClient,
+		Location:    config.Location,
+		Protocol:    config.Protocol,
+		appIDPrefix: config.AppIDPrefix,
+		Auth:        auth,
+		client:      pClient,
 	}, nil
 }
 
@@ -426,4 +429,8 @@ func (m Marathon) LeaderGet() (string, error) {
 	err = json.Unmarshal(body, leaderResponse)
 
 	return leaderResponse.Leader, err
+}
+
+func (m Marathon) GetAppIDPrefix() string {
+	return m.appIDPrefix
 }

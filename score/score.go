@@ -156,7 +156,7 @@ func (s *Scorer) EvaluateApps() {
 	if err != nil && i == 0 {
 		log.WithError(err).Error("Failed to evaluate")
 	}
-	log.Infof("%d apps qualified for penalty", i)
+	log.Debug("%d apps qualified for penalty", i)
 }
 
 func (s *Scorer) evaluateApps() (int, error) {

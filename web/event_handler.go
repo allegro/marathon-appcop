@@ -94,6 +94,9 @@ func (fh *eventHandler) handleStatusEvent(body []byte) error {
 		"TaskStatus": task.TaskStatus,
 	}).Debug("Got StatusEvent")
 
+	appMetric := task.GetMetric(fh.marathon.GetAppIDPrefix())
+	metrics.MarkApp(appMetric)
+
 	switch task.TaskStatus {
 	case taskFinished, taskFailed, taskKilled:
 		appID := task.AppID
