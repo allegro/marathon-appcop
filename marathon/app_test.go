@@ -93,6 +93,117 @@ func TestParseTasksRecievesMalformedJSONBlob(t *testing.T) {
 	require.Error(t, err)
 }
 
+var getMetricTestCases = []struct {
+	task               *Task
+	prefix             string
+	expectedTaskMetric string
+}{
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "com.example.domain.context/app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "domain.context.app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "/com.example.domain.context/app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "domain.context.app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "com.example.domain.context/app-name",
+		},
+		prefix:             "",
+		expectedTaskMetric: "com.example.domain.context.app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "com.example.domain.context/group/app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "domain.context.group.app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_staging",
+			AppID:      "com.example.domain.context/group/app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "domain.context.group.app-name.task_staging",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_staging",
+			AppID:      "com.example.domain.context/group/nested-group/app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "domain.context.group.nested-group.app-name.task_staging",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "app-name",
+		},
+		prefix:             "",
+		expectedTaskMetric: "app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "com.example.domain.context/app-name",
+		},
+		prefix:             "",
+		expectedTaskMetric: "com.example.domain.context.app-name.task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "task_running",
+			AppID:      "",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "task_running",
+	},
+	{
+		task: &Task{
+			TaskStatus: "",
+			AppID:      "com.example.domain.context/app-name",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "domain.context.app-name",
+	},
+	{
+		task: &Task{
+			TaskStatus: "",
+			AppID:      "",
+		},
+		prefix:             "com.example.",
+		expectedTaskMetric: "",
+	},
+}
+
+func TestTaskGetMetricTestCases(t *testing.T) {
+	t.Parallel()
+	for _, testCase := range getMetricTestCases {
+		taskMetric := testCase.task.GetMetric(testCase.prefix)
+		assert.Equal(t, testCase.expectedTaskMetric, taskMetric)
+	}
+}
+
 var penalizeTestCases = []struct {
 	app         *App
 	expectedApp *App

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/allegro/marathon-appcop/metrics"
 )
 
 const ApplicationImmunityLabel = "APP_IMMUNITY"
@@ -94,6 +96,28 @@ type Task struct {
 	Host               string              `json:"host"`
 	Ports              []int               `json:"ports"`
 	HealthCheckResults []HealthCheckResult `json:"healthCheckResults"`
+}
+
+// GetMetric returns a string indicating where this applications metric should be placed
+// in graphite in defined prefix. It is done by triming begining prefix (if defined)
+// from application id and replacing appID separators with
+// metrics separators appropriate for graphite.
+func (t Task) GetMetric(prefix string) string {
+	taskAppID := string(t.AppID)
+
+	var appID string
+	if prefix == "" {
+		appID = taskAppID
+	} else {
+		appID = strings.Replace(taskAppID, prefix, "", 1)
+	}
+	noRootAppID := strings.TrimPrefix(appID, "/")
+	metricPath := strings.Replace(noRootAppID, metrics.PathSeparator, metrics.MetricSeparator, -1)
+	taskStatus := strings.ToLower(t.TaskStatus)
+
+	filteredPathParts := metrics.FilterOutEmptyStrings([]string{metricPath, taskStatus})
+	return strings.Join(filteredPathParts, metrics.MetricSeparator)
+
 }
 
 // TaskID from marathon

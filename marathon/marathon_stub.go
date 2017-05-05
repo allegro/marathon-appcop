@@ -112,3 +112,7 @@ func (m MStub) GroupDelete(groupID GroupID) error {
 func (m MStub) GetEmptyLeafGroups() ([]*Group, error) {
 	return []*Group{}, nil
 }
+
+func (m MStub) GetAppIDPrefix() string {
+	return ""
+}

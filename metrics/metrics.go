@@ -16,23 +16,71 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
-var prefix string
+const (
+	PathSeparator   = "/"
+	MetricSeparator = "."
+)
+
+var (
+	prefix          string
+	instance        string
+	systemSubPrefix string
+	appSubPrefix    string
+)
+
+func FilterOutEmptyStrings(data []string) []string {
+	var parts []string
+	for _, part := range data {
+		if part != "" {
+			parts = append(parts, part)
+		}
+	}
+	return parts
+}
+
+func systemMetric(name string) string {
+	parts := FilterOutEmptyStrings([]string{systemSubPrefix, instance, name})
+	return strings.Join(parts, MetricSeparator)
+}
+
+func appMetric(name string) string {
+	parts := FilterOutEmptyStrings([]string{appSubPrefix, name})
+	return strings.Join(parts, MetricSeparator)
+}
 
 // Mark or register Meter on graphite
 func Mark(name string) {
-	meter := metrics.GetOrRegisterMeter(name, metrics.DefaultRegistry)
+	meter := metrics.GetOrRegisterMeter(
+		systemMetric(name),
+		metrics.DefaultRegistry,
+	)
+	meter.Mark(1)
+}
+
+// Mark or register Meter on graphite
+func MarkApp(name string) {
+	meter := metrics.GetOrRegisterMeter(
+		appMetric(name),
+		metrics.DefaultRegistry,
+	)
 	meter.Mark(1)
 }
 
 // Time execution of function
 func Time(name string, function func()) {
-	timer := metrics.GetOrRegisterTimer(name, metrics.DefaultRegistry)
+	timer := metrics.GetOrRegisterTimer(
+		systemMetric(name),
+		metrics.DefaultRegistry,
+	)
 	timer.Time(function)
 }
 
 // UpdateGauge for provided metric
 func UpdateGauge(name string, value int64) {
-	gauge := metrics.GetOrRegisterGauge(name, metrics.DefaultRegistry)
+	gauge := metrics.GetOrRegisterGauge(
+		systemMetric(name),
+		metrics.DefaultRegistry,
+	)
 	gauge.Update(value)
 }
 
@@ -46,6 +94,18 @@ func Init(cfg Config) error {
 		}
 		prefix = pfx
 	}
+
+	instance = cfg.Instance
+	if instance == "" {
+		ins, err := hostname()
+		if err != nil {
+			ins = "localhost"
+		}
+		instance = ins
+	}
+
+	systemSubPrefix = cfg.SystemSubPrefix
+	appSubPrefix = cfg.AppSubPrefix
 
 	collectSystemMetrics()
 
