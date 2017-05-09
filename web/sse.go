@@ -5,6 +5,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/allegro/marathon-appcop/marathon"
+	"github.com/allegro/marathon-appcop/metrics"
 	"github.com/allegro/marathon-appcop/mgc"
 	"github.com/allegro/marathon-appcop/score"
 )
@@ -51,9 +52,10 @@ func leaderPoll(service marathon.Marathoner, myLeader string) {
 		if leader == myLeader {
 			break
 		}
-		log.Debug("I am not leader")
+		metrics.UpdateGauge("leader", int64(0))
 		<-pollTicker.C
 	}
+	metrics.UpdateGauge("leader", int64(1))
 
 }
 
