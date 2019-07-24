@@ -100,7 +100,7 @@ func TestParseEventWhenSimpleDataIsProvidedAndNotCompleteEventIsProvidedShouldRe
 	sreader := strings.NewReader("event: status_update_event\ndata: testData\nlkajsd")
 	reader := bufio.NewReader(sreader)
 	expectedEvent := "status_update_event"
-	expectedError := errors.New("Unexpected EOF")
+	expectedError := errors.New("unexpected EOF")
 	// when
 	event, err := parseEvent(reader)
 	// then

@@ -24,6 +24,7 @@ const (
 	taskFinished = "TASK_FINISHED"
 	taskFailed   = "TASK_FAILED"
 	taskKilled   = "TASK_KILLED"
+	taskRunning  = "TASK_RUNNING"
 )
 
 func newEventHandler(id int, marathon marathon.Marathoner, eventQueue <-chan Event,
@@ -105,7 +106,13 @@ func (fh *eventHandler) handleStatusEvent(body []byte) error {
 			return err
 		}
 		fh.scoreUpdate <- score.Update{App: app, Update: 1}
-
+		return nil
+	case taskRunning:
+		log.WithFields(log.Fields{
+			"Id":    task.AppID,
+			"Host":  task.Host,
+			"Ports": task.Ports,
+		}).Info("Got task running status")
 		return nil
 	default:
 		log.WithFields(log.Fields{

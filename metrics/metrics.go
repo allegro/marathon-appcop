@@ -12,12 +12,14 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/cyberdelia/go-metrics-graphite"
+	graphite "github.com/cyberdelia/go-metrics-graphite"
 	"github.com/rcrowley/go-metrics"
 )
 
 const (
-	PathSeparator   = "/"
+	// PathSeparator is separator of groups in app name
+	PathSeparator = "/"
+	// MetricSeparator is separator of groups in metrics system
 	MetricSeparator = "."
 )
 
@@ -28,6 +30,7 @@ var (
 	appSubPrefix    string
 )
 
+// FilterOutEmptyStrings filters empty strings
 func FilterOutEmptyStrings(data []string) []string {
 	var parts []string
 	for _, part := range data {
@@ -57,7 +60,7 @@ func Mark(name string) {
 	meter.Mark(1)
 }
 
-// Mark or register Meter on graphite
+// MarkApp marks or register Meter on graphite
 func MarkApp(name string) {
 	meter := metrics.GetOrRegisterMeter(
 		appMetric(name),
@@ -124,7 +127,7 @@ func Init(cfg Config) error {
 		log.Infof("Metrics disabled")
 		return nil
 	default:
-		return fmt.Errorf("Invalid metrics target %s", cfg.Target)
+		return fmt.Errorf("invalid metrics target %s", cfg.Target)
 	}
 }
 

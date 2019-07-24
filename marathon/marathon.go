@@ -165,7 +165,7 @@ func (m Marathon) get(url string) ([]byte, error) {
 	if response.StatusCode != 200 {
 		metrics.Mark("marathon.get.error")
 		metrics.Mark(fmt.Sprintf("marathon.get.error.%d", response.StatusCode))
-		err = fmt.Errorf("Expected 200 but got %d for %s", response.StatusCode, response.Request.URL.Path)
+		err = fmt.Errorf("expected 200 but got %d for %s", response.StatusCode, response.Request.URL.Path)
 		m.logHTTPError(response, err)
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (m Marathon) update(url string, d []byte) ([]byte, error) {
 	if response.StatusCode != 200 {
 		metrics.Mark("marathon.put.error")
 		metrics.Mark(fmt.Sprintf("marathon.put.error.%d", response.StatusCode))
-		err = fmt.Errorf("Expected 200 but got %d for %s", response.StatusCode, response.Request.URL.Path)
+		err = fmt.Errorf("expected 200 but got %d for %s", response.StatusCode, response.Request.URL.Path)
 		m.logHTTPError(response, err)
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (m Marathon) delete(url string) ([]byte, error) {
 	if response.StatusCode != 200 {
 		metrics.Mark("marathon.delete.error")
 		metrics.Mark(fmt.Sprintf("marathon.delete.error.%d", response.StatusCode))
-		err = fmt.Errorf("Expected 200 but got %d for %s", response.StatusCode, response.Request.URL.Path)
+		err = fmt.Errorf("expected 200 but got %d for %s", response.StatusCode, response.Request.URL.Path)
 		m.logHTTPError(response, err)
 		return nil, err
 	}
