@@ -92,7 +92,7 @@ func parseEvent(reader *bufio.Reader) (Event, error) {
 		if err == io.EOF {
 			dispatch = e.parseLine(line)
 			if !dispatch {
-				return e, errors.New("Unexpected EOF")
+				return e, errors.New("unexpected EOF")
 			}
 			return e, io.EOF
 		}

@@ -34,7 +34,7 @@ type ScaleCounter struct {
 // AppsGet get stubbed apps
 func (m MStub) AppsGet() ([]*App, error) {
 	if m.AppsGetFail {
-		return nil, errors.New("Unable to get applications from marathon")
+		return nil, errors.New("unable to get applications from marathon")
 	}
 	return m.Apps, nil
 }
@@ -79,7 +79,7 @@ func (m MStub) LeaderGet() (string, error) {
 // AppScaleDown by one instance
 func (m MStub) AppScaleDown(app *App) error {
 	if m.AppScaleDownFail {
-		return errors.New("Unable to scale down")
+		return errors.New("unable to scale down")
 	}
 	m.ScaleCounter.Counter = 1
 	return nil
@@ -88,12 +88,12 @@ func (m MStub) AppScaleDown(app *App) error {
 // AppDelete application by provided AppID
 func (m MStub) AppDelete(appID AppID) error {
 	if m.AppDelFail {
-		return errors.New("Unable to delete app")
+		return errors.New("unable to delete app")
 	}
 	if m.AppDelHalfFail {
 		if m.FailCounter.Counter%2 == 0 {
 			m.FailCounter.Counter++
-			return errors.New("Unable to delete app")
+			return errors.New("unable to delete app")
 		}
 		m.FailCounter.Counter++
 	}
@@ -103,7 +103,7 @@ func (m MStub) AppDelete(appID AppID) error {
 // GroupDelete by provided GroupID
 func (m MStub) GroupDelete(groupID GroupID) error {
 	if m.GroupDelFail {
-		return errors.New("Unable to delete group")
+		return errors.New("unable to delete group")
 	}
 	return nil
 }

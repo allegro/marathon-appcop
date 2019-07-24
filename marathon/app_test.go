@@ -252,7 +252,7 @@ var penalizeTestCases = []struct {
 		expectedApp: &App{ID: "testApp4",
 			Instances: 0,
 			Labels:    map[string]string{"APPLABEL": "true"}},
-		expectedErr: fmt.Errorf("Unable to scale down, zero instance"),
+		expectedErr: fmt.Errorf("unable to scale down, zero instance"),
 	},
 }
 

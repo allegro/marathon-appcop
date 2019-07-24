@@ -156,7 +156,7 @@ func (s *Scorer) EvaluateApps() {
 	if err != nil && i == 0 {
 		log.WithError(err).Error("Failed to evaluate")
 	}
-	log.Debug("%d apps qualified for penalty", i)
+	log.Debugf("%d apps qualified for penalty", i)
 }
 
 func (s *Scorer) evaluateApps() (int, error) {
@@ -221,7 +221,7 @@ func (s *Scorer) scaleDown(appID marathon.AppID) error {
 	if app.HasImmunity() {
 		// returning error up makes sure rate limiting works,
 		// otherwise AppCop could loop over immune apps
-		return fmt.Errorf("App: %s has immunity", app.ID)
+		return fmt.Errorf("app: %s has immunity", app.ID)
 	}
 
 	err = s.service.AppScaleDown(app)

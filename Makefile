@@ -29,8 +29,8 @@ deps:
 lint: deps lint-deps onlylint
 
 lint-deps:
-	go get -u github.com/alecthomas/gometalinter
-	gometalinter --install
+	@which golangci-lint > /dev/null || \
+	(go get -u github.com/golangci/golangci-lint/cmd/golangci-lint)
 
 release: lint test
 	GOARCH=amd64 GOOS=linux $(GO_BUILD) -o build/appcop .
@@ -45,14 +45,7 @@ pack: test lint build
 	docker build -t appcop . && mkdir -p dist && docker run -v ${PWD}/dist:/work/dist appcop
 
 onlylint: build
-	gometalinter \
-	--deadline=720s \
-	--disable=dupl \
-	--disable=gotype \
-	--disable=gas \
-	--disable=golint \
-	--enable=gofmt \
-	--vendor
+	golangci-lint run --config=golangcilinter.yaml web marathon metrics mgc score config
 
 version: deps
 	echo -n $(v) > VERSION

@@ -42,7 +42,7 @@ func (app *App) penalize() error {
 	if app.Instances >= 1 {
 		app.Instances--
 	} else {
-		return fmt.Errorf("Unable to scale down, zero instance")
+		return fmt.Errorf("unable to scale down, zero instance")
 	}
 
 	if app.Instances == 0 {
