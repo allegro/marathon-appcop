@@ -31,6 +31,7 @@ ADD . /work
 
 ENTRYPOINT cd /work && fpm -s dir -t deb \
 	--deb-upstart debian/appcop.upstart \
+	--deb-systemd debian/appcop.service \
 	-n appcop \
 	-v `cat ./VERSION` \
 	-m "$MAINTAINER" \
