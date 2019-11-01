@@ -13,6 +13,9 @@ all: lint test build
 build: deps
 	$(GO_BUILD) -o build/appcop .
 
+build_linux:
+	env GOOS=linux GOARCH=amd64 GO111MODULE=on $(GO_BUILD) -o build/appcop .
+
 clean:
 	go clean -v .
 	rm -rf build
@@ -41,7 +44,7 @@ test: deps $(SOURCES) $(TEST_TARGETS)
 $(TEST_TARGETS):
 	go test -coverprofile=coverage/$(shell basename $@).coverprofile $@
 
-pack: test lint build
+pack: test lint build_linux
 	docker build -t appcop . && mkdir -p dist && docker run -v ${PWD}/dist:/work/dist appcop
 
 onlylint: build
